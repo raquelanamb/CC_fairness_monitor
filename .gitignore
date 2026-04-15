@@ -1,0 +1,35 @@
+# data (large files, not for version control)
+data/raw/
+data/processed/
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# virtual environment
+.venv/
+venv/
+env/
+
+# jupyter
+.ipynb_checkpoints/
+
+# results and figures (generated, not source)
+results/
+figures/
+
+# intermediate files
+intermediate/
+
+# os
+.DS_Store
+Thumbs.db
+
+# ide
+.vscode/
+.idea/
