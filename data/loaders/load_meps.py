@@ -1,7 +1,7 @@
 """
-LSAC dataset loader.
-
-Reads the preprocessed CSV from data/processed/lsac.csv and returns a DatasetBundle with train/test splits.
+MEPS (Medical Expenditure Panel Survey) dataset loader.
+ 
+Reads the preprocessed CSV from data/processed/meps.csv and returns a DatasetBundle with train/test splits.
 
 Split method follows ConFair's (Yang & Meliou, 2024) PrepareData.py: np.random.seed(seed) + np.random.permutation() rather 
 than sklearn's train_test_split, for reproducibility and comparability with their pipeline.
@@ -20,11 +20,11 @@ sys_path.insert(0, str(Path(__file__).resolve().parent.parent))
 from bundle import DatasetBundle
 
 
-PROCESSED_PATH = Path("data/processed/lsac.csv")
+PROCESSED_PATH = Path("data/processed/meps.csv")
 
-LABEL_COL = "pass_bar"
-PROTECTED_COL = "race"
-DATASET_NAME = "LSAC"
+LABEL_COL = "UTILIZATION"
+PROTECTED_COL = "RACE"
+DATASET_NAME = "MEPS"
 
 # ConFair seeds used for their 20-run evaluation:
 CONFAIR_SEEDS = [
@@ -32,8 +32,8 @@ CONFAIR_SEEDS = [
     50, 583, 5278, 100000, 48879, 51966, 57005, 7777, 100, 923
 ] # (used later in the experiment pipeline, when I run a 20-run baseline comparison against ConFair's NO-INTERVENTION results)
 
-# loads the preprocessed LSAC dataset & returns a DatasetBundle:
-def load_lsac(
+# loads the preprocessed MEPS dataset & returns a DatasetBundle:
+def load_meps(
     processed_path: Path = PROCESSED_PATH,
     seed: int = 42,
     train_size: float = 0.7,
