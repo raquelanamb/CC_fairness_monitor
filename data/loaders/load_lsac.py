@@ -32,6 +32,9 @@ CONFAIR_SEEDS = [
     50, 583, 5278, 100000, 48879, 51966, 57005, 7777, 100, 923
 ] # (used later in the experiment pipeline, when I run a 20-run baseline comparison against ConFair's NO-INTERVENTION results)
 
+# columns w/ more than this many distinct values are treated as continuous (ConFair's num_threshold=8 rule):
+NUM_THRESHOLD = 8
+
 # loads the preprocessed LSAC dataset & returns a DatasetBundle:
 def load_lsac(
     processed_path: Path = PROCESSED_PATH,
@@ -49,6 +52,14 @@ def load_lsac(
     X = df[feature_names].values.astype(float)
     y = df[LABEL_COL].values.astype(int)
     protected = df[PROTECTED_COL].values.astype(int)
+
+    # identify continuous feature columns (> NUM_THRESHOLD distinct values), per ConFair's num_threshold=8 rule.
+    # CCs are built on continuous features ONLY (Fariha et al. Alg. 1 line 1; ConFair LearnCCrules.py builds CCs only on the 
+    # continuous columns):
+    continuous_indices = [
+        i for i in range(X.shape[1])
+        if len(np.unique(X[:, i])) > NUM_THRESHOLD
+    ]
 
     # split following ConFair's method (np.random.seed + np.random.permutation, not sklearn train_test_split):
     n = len(df)
@@ -70,4 +81,5 @@ def load_lsac(
         feature_names=feature_names,
         protected_name=PROTECTED_COL,
         label_name=LABEL_COL,
+        continuous_indices=continuous_indices,
     )

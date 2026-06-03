@@ -3,6 +3,8 @@ DatasetBundle: standardized container for preprocessed dataset splits.
 
 This is the interface between the preprocessing pipeline & the CC monitoring experiments. All dataset loaders produce a 
 DatasetBundle, & all downstream code (CC learning, drift simulation, monitoring) consumes one.
+DatasetBundle is a standardized container for a preprocessed dataset split into train & test sets, w/ feature matrix, labels, & 
+protected attribute values.
 """
 
 import numpy as np
@@ -10,48 +12,24 @@ from dataclasses import dataclass
 from typing import List
 
 
-# DatasetBundle is a shared contract btwn the preprocessing pipeline & the experiment code. 
+# The following is a shared contract btwn the preprocessing pipeline & the experiment code. 
 # instead of passing X_train, y_train, protected_train, etc. as separate arguments everywhere, I package them into one object.
 @dataclass
 class DatasetBundle:
-    """
-    Standardized container for a preprocessed dataset split into train & test sets, w/ feature matrix, labels, & protected 
-    attribute values.
-
-    Fields
-    ------
-    X_train : np.ndarray, shape (n_train, n_features)
-        Training feature matrix
-    X_test : np.ndarray, shape (n_test, n_features)
-        Test feature matrix
-    y_train : np.ndarray, shape (n_train,)
-        Training labels (binary: 0 or 1)
-    y_test : np.ndarray, shape (n_test,)
-        Test labels (binary: 0 or 1)
-    protected_train : np.ndarray, shape (n_train,)
-        Protected attribute values for training set (binary: 0 = minority/protected group, 1 = majority/privileged group)
-    protected_test : np.ndarray, shape (n_test,)
-        Protected attribute values for test set (binary: 0 or 1)
-    dataset_name : str
-        Human-readable name of the dataset (e.g. "LSAC", "MEPS", "Credit")
-    feature_names : List[str]
-        Names of the feature columns, in the same order as columns in X_train and X_test
-    protected_name : str
-        Name of the protected attribute column (e.g. "race", "RACE", "age")
-    label_name : str
-        Name of the label column (e.g. "pass_bar", "UTILIZATION", "SeriousDlqin2yrs")
-    """
-    X_train: np.ndarray
-    X_test: np.ndarray
-    y_train: np.ndarray
-    y_test: np.ndarray
-    protected_train: np.ndarray
-    protected_test: np.ndarray
-    dataset_name: str
-    feature_names: List[str]
-    protected_name: str
-    label_name: str
-
+    X_train: np.ndarray  # training feature matrix, shape (n_train, n_features)
+    X_test: np.ndarray  # test feature matrix, shape (n_test, n_features)
+    y_train: np.ndarray  # training labels (binary: 0 or 1), shape (n_train,)
+    y_test: np.ndarray  # test labels (binary: 0 or 1), shape (n_test,)
+    protected_train: np.ndarray  # protected attribute values for training set (binary: 0 = minority/protected group, 1 = majority/privileged group), shape (n_train,)
+    protected_test: np.ndarray  # protected attribute values for test set (binary: 0 or 1), shape (n_test,)
+    dataset_name: str  # name of dataset (e.g. "LSAC", "MEPS", "Credit")
+    feature_names: List[str]  # names of the feature columns, in same order as columns in X_train & X_test
+    protected_name: str  # name of protected attribute column (e.g. "race", "RACE", "age")
+    label_name: str  # name of label column (e.g. "pass_bar", "UTILIZATION", "SeriousDlqin2yrs")
+    continuous_indices: List[int]  # Column indices of X_train/X_test that are continuous (> 8 distinct values)
+        # Note: This is following ConFair's num_threshold=8 rule. Conformance Constraints are built on continuous features ONLY 
+        # (Fariha et al. 2021 Algorithm 1 line 1 drops non-numerical attributes; ConFair's LearnCCrules.py builds CCs only on the
+        # continuous columns). So, the CC code reads this field to select the right columns
 
 '''
 Note on lack of validation set:
