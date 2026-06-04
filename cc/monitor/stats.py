@@ -14,7 +14,7 @@ Each tool is justified below.
   - compute_divergence: Wasserstein (earth-mover's) distance between consecutive batches' violation distributions. Tracks change in the 
                         SHAPE of the violation distribution, which the EWMA mean can miss (e.g. the mean is stable but the distribution
                         splits or spreads). Wasserstein is an established measure for unsupervised, distribution-based drift / change-point 
-                        detection (Faber et al. 2021, WATCH; Goldenberg & Webb 2018). I use the MEASURE, not any specific algorithm.
+                        detection (Faber et al. 2021, WATCH). I use the MEASURE, not any specific algorithm.
                         Chosen over KL/JS because it operates directly on samples (no density estimation) and stays finite under 
                         non-overlapping supports.
 
