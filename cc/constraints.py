@@ -13,10 +13,13 @@ INPUT CONVENTIONS:
   1. This class receives a feature matrix containing ONLY continuous columns (selected upstream via bundle.continuous_indices, 
      per ConFair's num_threshold=8 rule). All columns are treated as continuous.
   2. This class receives ALREADY-STANDARDIZED data. Standardization is done ONCE at the monitor level using the full training 
-     set's mean/std, then the same frame is applied to every subgroup and to serving batches. This follows ConFair's 
-     LearnCCrules.py, which standardizes the whole training set's continuous columns up front (cc_df[cc_cols] = (cc_df - mean) / std)
-     BEFORE splitting into subgroups. A shared standardization frame keeps violation scores comparable ACROSS subgroups, which 
-     matters because the monitor assigns each serving point to its minimum-violation subgroup.
+     set's mean/std, then the same frame is applied to every subgroup and to every serving batch. This deliberately diverges from 
+     ConFair's LearnCCrules.py, which standardizes each split by its OWN statistics (train by train's mean/std, val by val's, 
+     test by test's -- three independent standardizations). That is fine for ConFair's static train/test fairness evaluation, but 
+     it would be wrong for a drift monitor: re-standardizing each serving batch by its own mean/std would re-center and re-scale 
+     away the exact mean/variance shifts the monitor exists to detect. A single fixed training frame (a) preserves those shifts so 
+     they surface as elevated violation, and (b) keeps violation scores comparable ACROSS subgroups, which matters because the 
+     monitor assigns each serving point to its minimum-violation subgroup.
 """
 
 import numpy as np
@@ -44,8 +47,10 @@ class ConformanceConstraints:
         # KDE bandwidth (Yang & Meliou's dense_h = 0.1):
         density_bandwidth: float = 0.1,
 
-        # KDE kernel (their dense_kernal = 'gaussian'):
-        density_kernel: str = "gaussian",
+        # KDE kernel. ConFair's LearnCCrules.py picks the kernel PER DATASET in __main__, not from the function signature: credit, lsac, 
+        # and meps16 -> 'exponential'; only cardio and ACSI use 'gaussian'. The 'guassian' (sic) default in their learn_cc_models() 
+        # signature is overridden for every dataset and never actually runs. All three of our datasets resolve to exponential:
+        density_kernel: str = "exponential",
     ):
     
         self.bound_factor = bound_factor
@@ -80,7 +85,7 @@ class ConformanceConstraints:
         if keep < 1 or keep >= n:
             return X
 
-        # creates a kernel density estimator w/ parameters based on Yang and Meliou (bandwidth 0.1, gaussian kernel). 
+        # creates a kernel density estimator w/ parameters based on Yang and Meliou (bandwidth 0.1, exponential kernel). 
         # KDE estimates how "dense" the data is at any given point (how many neighbors are nearby):
         kde = KernelDensity(bandwidth=self.density_bandwidth, kernel=self.density_kernel)
 
@@ -128,9 +133,10 @@ class ConformanceConstraints:
         self.lower_bounds_ = means - self.bound_factor * self.sigmas_
         self.upper_bounds_ = means + self.bound_factor * self.sigmas_
 
-        # importance weights (Fariha Alg. 1 line 7):
-        # gamma_k = 1 / log(2 + sigma_k): lower-variance projections get HIGHER weight because they construct stronger 
-        # (more discerning) constraints:
+        # importance weights (Fariha Alg. 1 line 7 / Appendix A): gamma_k = 1 / log(2 + sigma_k)
+        # lower-variance projections get higher weight (stronger constraints)
+        # NB: Yang & Meliou's paper (Eq. 1) prints a different formula, 1 - sigma/(max-min); I use Fariha's because their code runs 
+        # PROSE, which implements Fariha:
         raw_weights = 1.0 / np.log(2.0 + self.sigmas_)
 
         # normalize to sum to 1 (Alg. 1 line 8: divide by Z = sum of gammas):

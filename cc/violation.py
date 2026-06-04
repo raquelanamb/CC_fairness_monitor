@@ -13,7 +13,7 @@ where:
   - [lb_k, ub_k] are the learned bounds for projection k,
   - σ_k is the standard deviation of projection k on the fit data (this is the scaling factor α = 1/σ_k from Fariha Section 3.2,
     which standardizes distances so projections are comparable),
-  - q_k is the normalized importance weight of projection k.
+  - q_k is the normalized importance weight (computed in constraints.py; Fariha's 1/log(2+sigma), see note there).
 
 A violation of 0 means the tuple is fully inside all bounds (conforms). Higher values mean the tuple sits further outside the learned 
 constraints. Each projection's contribution is bounded by its weight q_k (since η < 1), so the total violation is bounded by Σ q_k = 1.
