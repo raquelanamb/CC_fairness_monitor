@@ -135,8 +135,10 @@ class ConformanceConstraints:
 
         # importance weights (Fariha Alg. 1 line 7 / Appendix A): gamma_k = 1 / log(2 + sigma_k)
         # lower-variance projections get higher weight (stronger constraints)
-        # NB: Yang & Meliou's paper (Eq. 1) prints a different formula, 1 - sigma/(max-min); I use Fariha's because their code runs 
-        # PROSE, which implements Fariha:
+        # NB: I reimplement Fariha et al.'s published weight formula (1/log(2+σ), Algorithm 1 line 7) because it is the complete, 
+        # inspectable, published CC-discovery algorithm. Yang & Meliou's paper prints a different weight formula (q_i = 1 − σ/(max−min)), 
+        # but their implementation delegates to the proprietary PROSE datainsights library, so I cannot verify which formula their 
+        # pipeline actually used at runtime. I therefore follow the published Fariha algorithm I can fully inspect and justify:
         raw_weights = 1.0 / np.log(2.0 + self.sigmas_)
 
         # normalize to sum to 1 (Alg. 1 line 8: divide by Z = sum of gammas):
