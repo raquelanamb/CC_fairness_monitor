@@ -22,11 +22,7 @@ from xgboost import XGBClassifier
 
 
 # fixed XGB config drawn from within ConFair's grid-search range:
-XGB_PARAMS = dict(
-    n_estimators=10,
-    max_depth=3,
-    learning_rate=0.1,
-)
+XGB_PARAMS = dict(n_estimators=10, max_depth=3, learning_rate=0.1)
 
 # train and return a fitted classifier:
 def train_model(
@@ -42,11 +38,7 @@ def train_model(
     if model_name == "lr":
         model = LogisticRegression(max_iter=1000, random_state=seed)
     elif model_name == "xgb":
-        model = XGBClassifier(
-            random_state=seed,
-            eval_metric="logloss",
-            **XGB_PARAMS,
-        )
+        model = XGBClassifier(random_state=seed, eval_metric="logloss", **XGB_PARAMS)
     else:
         raise ValueError(f"Unknown model_name {model_name!r}; choose 'lr' or 'xgb'.")
 
