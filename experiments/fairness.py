@@ -23,6 +23,18 @@ Transformed variants (for consistent "higher = fairer" orientation in the correl
 import numpy as np
 from sklearn.metrics import confusion_matrix
 
+# 0.5 * (TPR + TNR) - shared by the threshold tuner (models.py) and compute_metrics:
+def balanced_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    y_true = np.asarray(y_true, dtype=int)
+    y_pred = np.asarray(y_pred, dtype=int)
+    P = (y_true == 1).sum()
+    N = (y_true == 0).sum()
+    TP = ((y_true == 1) & (y_pred == 1)).sum()
+    TN = ((y_true == 0) & (y_pred == 0)).sum()
+    TPR = TP / P if P > 0 else 0.0
+    TNR = TN / N if N > 0 else 0.0
+    return 0.5 * (TPR + TNR)
+
 
 # compute TPR, TNR, FPR, and SR (selection rate) for one group, following ConFair's eval_predictions (confusion_matrix with labels=[0,1]):
 def _group_rates(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
@@ -67,8 +79,7 @@ def compute_metrics(
     AOD = 0.5 * ((r0["FPR"] - r1["FPR"]) + (r0["TPR"] - r1["TPR"]))
 
     # BalAcc over the WHOLE set (ConFair: bal_acc_all)
-    r_all = _group_rates(y_true, y_pred)
-    BalAcc = 0.5 * (r_all["TPR"] + r_all["TNR"])
+    BalAcc = balanced_accuracy(y_true, y_pred)
 
     # transformed variants (higher = fairer, bounded in [0, 1]):
     DI_star = min(DI, 1.0 / DI) if DI > 0 else 0.0
