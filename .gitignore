@@ -1,6 +1,8 @@
 # data (large files, not for version control)
 data/raw/
 data/processed/
+experiments/confair-validation/confair-eval.csv
+experiments/confair-validation/diffair-eval.csv
 
 # python
 __pycache__/
@@ -25,6 +27,7 @@ figures/
 
 # intermediate files
 intermediate/
+archive/
 
 # os
 .DS_Store
