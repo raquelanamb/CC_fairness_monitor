@@ -58,7 +58,7 @@ def load_credit(
     # continuous columns):
     continuous_indices = [
         i for i in range(X.shape[1])
-        if len(np.unique(X[:, i])) > NUM_THRESHOLD
+        if len(np.unique(X[:, i])) >= NUM_THRESHOLD
     ]
 
     # split following ConFair's method (np.random.seed + np.random.permutation, not sklearn train_test_split):
