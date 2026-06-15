@@ -195,12 +195,12 @@ def _write_csv(rows, out_path):
 if __name__ == "__main__":
     from data.loaders.load_lsac import load_lsac, CONFAIR_SEEDS as LSAC_SEEDS
     from data.loaders.load_meps import load_meps, CONFAIR_SEEDS as MEPS_SEEDS
-    from data.loaders.load_credit import load_credit, CONFAIR_SEEDS as CREDIT_SEEDS
+    # from data.loaders.load_credit import load_credit, CONFAIR_SEEDS as CREDIT_SEEDS
 
     loaders = {
         "lsac": load_lsac,
         "meps": load_meps,
-        "credit": load_credit,
+        # "credit": load_credit,
     }
 
     # FIRST full-matrix run - use a small seed count to verify the whole matrix runs end-to-end, then switch to the full 20 seeds for 
