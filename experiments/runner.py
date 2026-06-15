@@ -183,7 +183,13 @@ def run_single_experiment(
         kl = _kl_divergence(X_train_cont, X_batch_cont)
 
         # classifier - fairness metrics for this batch:
-        y_pred = predict(model, batch.X, threshold=threshold)
+        # The classifier was trained on ALL features WITH the protected attribute appended (matching ConFair's sensi_col_in_training=True 
+        # and the baseline-validation setup). The drift stream carries only bundle features, so we append the batch's protected column 
+        # before predicting, keeping this classifier identical to the validated baseline one. The protected attribute is used here as a 
+        # classifier feature; it is used SEPARATELY (below) as the grouping variable for the fairness metrics.
+        # (This does not involve the CC monitor, which never sees protected)
+        X_batch_clf = np.column_stack([batch.X, batch.protected])
+        y_pred = predict(model, X_batch_clf, threshold=threshold)
         fair = compute_metrics(batch.y, y_pred, batch.protected)
 
         records.append(BatchRecord(
