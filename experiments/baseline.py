@@ -14,9 +14,9 @@ reported targets.
 
 Note on expected agreement:
   - LR should land close to ConFair's LR numbers.
-  - XGBoost may differ more: ConFair grid-searches XGB on a validation set, whereas this project uses a fixed in-grid config and no 
-    validation set (documented in bundle.py / models.py). Goal is "same ballpark", not exact.
-  - Compare RAW-to-RAW (this prints raw DI/AOD/BalAcc, matching ConFair's `value` column, NOT the DI*/AOD* transformed variants).
+  - XGBoost may differ more because ConFair grid-searches XGB on a validation set, whereas this project uses a fixed in-grid config and no 
+    validation set (documented in bundle.py / models.py). Goal is to be in the same ballpark, not exact.
+  - Compare RAW-to-RAW (this prints raw DI/AOD/BalAcc, matching ConFair's 'value' column, NOT the DI*/AOD* transformed variants).
 """
 
 import sys
@@ -43,7 +43,7 @@ CONFAIR_TARGETS = {
 
 
 # run the NO-INTERVENTION baseline for one dataset across all seeds:
-def run_baseline(loader,  # a loader function (e.g. load_lsac) accepting a `seed` kwarg and returning a DatasetBundle
+def run_baseline(loader,  # a loader function (e.g. load_lsac) accepting a 'seed' and returning a DatasetBundle
                  seeds,  # list of seeds (the dataset's CONFAIR_SEEDS)
                  dataset_key: str  # 'lsac', 'meps', or 'credit' (for printing targets)
                 ):

@@ -72,13 +72,13 @@ def compute_metrics(
     r0 = _group_rates(y_true[g0], y_pred[g0])
     r1 = _group_rates(y_true[g1], y_pred[g1])
 
-    # DI = SR_G0 / SR_G1  (ConFair: 0 if SR_G1 == 0)
+    # DI = SR_G0 / SR_G1  (ConFair: 0 if SR_G1 == 0):
     DI = r0["SR"] / r1["SR"] if r1["SR"] > 0 else 0.0
 
-    # AOD = 0.5 * [(FPR_G0 - FPR_G1) + (TPR_G0 - TPR_G1)]
+    # AOD = 0.5 * [(FPR_G0 - FPR_G1) + (TPR_G0 - TPR_G1)]:
     AOD = 0.5 * ((r0["FPR"] - r1["FPR"]) + (r0["TPR"] - r1["TPR"]))
 
-    # BalAcc over the WHOLE set (ConFair: bal_acc_all)
+    # BalAcc over the WHOLE set (ConFair: bal_acc_all):
     BalAcc = balanced_accuracy(y_true, y_pred)
 
     # transformed variants (higher = fairer, bounded in [0, 1]):

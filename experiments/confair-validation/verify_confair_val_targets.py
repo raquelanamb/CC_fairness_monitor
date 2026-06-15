@@ -6,6 +6,7 @@ CONFAIR and DIFFAIR evaluation files. Confirms the comparison targets used in my
 import pandas as pd
 import csv
 
+# paths to locally saved evaluation results from ConFair repo:
 EVAL_FILES = {
     "confair": "experiments/confair-validation/confair-eval.csv",
     "diffair": "experiments/confair-validation/diffair-eval.csv",
@@ -58,9 +59,7 @@ def summarize(path, source_name):
 
 # confirm ORIG values are identical across the two eval files:
 def check_files_agree():
-    print(f"\n{'='*82}")
-    print("  CROSS-FILE CHECK: do confair & diffair agree on ORIG?")
-    print(f"{'='*82}")
+    print("Cross-file check: do ConFair & DifFair agree on ORIG?")
     c = pd.read_csv(EVAL_FILES["confair"])
     d = pd.read_csv(EVAL_FILES["diffair"])
     cf = c[(c["method"] == "ORIG") & (c["group"] == "all")]
@@ -77,8 +76,8 @@ def check_files_agree():
                     all_match = False
                     print(f"  MISMATCH {ds} {model} {metric}: "
                           f"confair={cv:.4f} diffair={dv:.4f}")
-    print("  All ORIG means identical across both files." if all_match
-          else "  Some values differ (see above).")
+    print("Yes, all ORIG means identical across both files." if all_match
+          else "No, some values differ (see above).")
 
 
 if __name__ == "__main__":

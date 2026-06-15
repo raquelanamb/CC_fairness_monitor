@@ -32,8 +32,7 @@ from experiments.fairness import balanced_accuracy
 XGB_PARAMS = dict(n_estimators=10, max_depth=3, learning_rate=0.1)
 
 
-# scan 100 thresholds in [0.01, 0.99], return the one maximizing balanced
-# accuracy (first if tied), replicating ConFair's find_optimal_thres:
+# scan 100 thresholds in [0.01, 0.99], return the one maximizing balanced accuracy (first if tied), replicating ConFair's find_optimal_thres:
 def find_optimal_thres(y_true, y_scores, num_thresh: int = 100) -> float:
     thresholds = np.linspace(0.01, 0.99, num_thresh)
     ba = np.zeros(num_thresh)
@@ -72,5 +71,5 @@ def train_model(model_name, X_train, y_train, seed=42, tune_threshold=True):
 # return binary predictions (0/1) using the given probability threshold:
 def predict(model, X, threshold: float = 0.5) -> np.ndarray:
     X = np.asarray(X, dtype=float)
-    scores = model.predict_proba(X)[:, 1]
+    scores = model.predict_proba(X)[:, 1]  # [:, 1] grabs the positive-class probability column
     return (scores > threshold).astype(int)

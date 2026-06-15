@@ -142,7 +142,7 @@ class FairnessDriftMonitor:
         # global standardization frame (over ALL continuous training data):
         mean = X_cont.mean(axis=0)
         std = X_cont.std(axis=0)
-        std = np.where(std < 1e-12, 1.0, std)
+        std = np.where(std < 1e-12, 1.0, std)  # guard zero-variance columns (avoid divide-by-zero):
         X_std = (X_cont - mean) / std
 
         protected = np.asarray(bundle.protected_train, dtype=int)
@@ -228,6 +228,7 @@ class FairnessDriftMonitor:
                     std=float(vals.std()), count=count,
                 )
             else:
+                # record empty subgroups too, so every batch has all subgroup keys:
                 subgroup_stats[name] = SubgroupStats(name=name, mean=0.0, std=0.0, count=0)
 
         # update EWMA of the global mean violation (initialize to first batch's mean):
@@ -241,6 +242,9 @@ class FairnessDriftMonitor:
             divergence = None
         else:
             divergence = compute_divergence(min_viol, self._prev_violations)
+
+        # divergence compares the distribution of per-point MIN violations between consecutive batches (not the full violation matrix 
+        # or the means) — how the shape of "best-conformance" scores shifts batch-to-batch:
         self._prev_violations = min_viol
 
         # check control-limit alert- compare the EWMA against the GLOBAL baseline:
