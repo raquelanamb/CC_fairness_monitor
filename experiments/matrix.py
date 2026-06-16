@@ -5,7 +5,7 @@ For every cell, this fits the monitor, trains the classifier, generates a drifte
 and records the Spearman/Pearson correlation of each CC signal (and the KS/KL baselines) against each fairness metric. Correlations are 
 averaged across seeds, since a single seed's 20-batch correlation is noisy; the seed-averaged value is the reportable result.
 
-Scenario library (13 scenarios), carried forward from the prior design:
+Scenario library (13 scenarios):
   - no_drift                          (control)
   - gradual_group  mag in {0.5,1,2}   (3)
   - gradual_global mag in {0.5,1,2}   (3)
@@ -15,8 +15,7 @@ Scenario library (13 scenarios), carried forward from the prior design:
 Output: one row per (dataset, scenario, model, signal, metric) with the seed-averaged Spearman and Pearson correlations (and their std 
 across seeds), written to a CSV for analysis and plotting.
 
-Note on cost: 3 datasets x 13 scenarios x 2 models x N seeds calls to the runner. Use a small N (e.g. 3) for a first full-matrix smoke run, 
-then 20 for the reportable results. The HPC is the place for the full 20-seed run if local is slow.
+Note on cost: 3 datasets x 13 scenarios x 2 models x N seeds calls to the runner. The full 20-seed run if local is very slow.
 """
 
 import sys
