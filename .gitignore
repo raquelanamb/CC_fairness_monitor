@@ -21,9 +21,9 @@ env/
 # jupyter
 .ipynb_checkpoints/
 
-# results and figures (generated, not source)
-results/
-figures/
+# results and figures (generated, not source) ?
+# results/
+# figures/
 
 # intermediate files
 intermediate/
