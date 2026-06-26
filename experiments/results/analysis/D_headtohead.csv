@@ -1,0 +1,11 @@
+scenario_group,role,signal,abs_spearman,n_dsets
+group,best CC,global_ewma,0.28228521455974065,3
+group,baseline,kl_divergence,0.2615842466120494,3
+group,baseline,ks_statistic,0.2612704373059167,3
+group,best subgroup,per_subgroup_ewma[min_neg],0.26380493747757733,2
+group,best global,global_ewma,0.28228521455974065,3
+global,best CC,per_subgroup_ewma[min_neg],0.5052078933245775,2
+global,baseline,ks_statistic,0.41841454635880704,3
+global,baseline,kl_divergence,0.39900727630049093,3
+global,best subgroup,per_subgroup_ewma[min_neg],0.5052078933245775,2
+global,best global,global_mean,0.41411432064842907,3

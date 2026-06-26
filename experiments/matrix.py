@@ -218,7 +218,7 @@ if __name__ == "__main__":
         seeds_by_dataset=seeds_by_dataset,
         models=("lr", "xgb"),
         n_batches=20,
-        out_path="experiments/results/matrix_results_full.csv",
+        out_path="experiments/results/matrix_results_all_scenarios.csv",
         drift_continuous_only=False,
     )
     

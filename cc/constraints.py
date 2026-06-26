@@ -51,6 +51,16 @@ class ConformanceConstraints:
         # and meps16 -> 'exponential'; only cardio and ACSI use 'gaussian'. The 'guassian' (sic) default in their learn_cc_models() 
         # signature is overridden for every dataset and never actually runs. All three of our datasets resolve to exponential:
         density_kernel: str = "exponential",
+
+        # for subgroups LARGER than density_exact_below, the KDE is FIT on a random subsample of this many points, then used to score (rank) 
+        # all points. This approximates only the density-ranking heuristic that selects which points to learn from; it does not subsample 
+        # the scored set and does not change the violation semantics. The density estimate is stable from a representative subsample, so the 
+        # retained dense set is effectively unchanged while removing the O(n^2) cost:
+        density_fit_subsample: int = 10000,
+        density_exact_below: int = 10000,
+
+        # seed for the fit-subsample selection, so the density filter is deterministic and reproducible:
+        density_random_state: int = 0,
     ):
     
         self.bound_factor = bound_factor
@@ -58,6 +68,9 @@ class ConformanceConstraints:
         self.density_keep_frac = density_keep_frac
         self.density_bandwidth = density_bandwidth
         self.density_kernel = density_kernel
+        self.density_fit_subsample = density_fit_subsample
+        self.density_exact_below = density_exact_below
+        self.density_random_state = density_random_state
 
         # learned during fit():
         self.projections_ = None  # (K, n_features) projection directions
@@ -71,6 +84,12 @@ class ConformanceConstraints:
     # Yang & Meliou Algorithm 3: keep only the densest points before learning constraints, so the bounds reflect the subgroup's core 
     # distribution and are not loosened by sparse outliers. Uses kernel density estimation, then keeps the top int(density_keep_frac * n) 
     # points by density (their k = 0.2 * n).
+    # - TRACTABILITY: the naive KDE scores every point against every point, which is O(n^2) and dominates runtime on large subgroups. 
+    #   For subgroups larger than density_exact_below, the KDE is FIT on a random subsample of density_fit_subsample points and then used to 
+    #   SCORE all n points. This approximates only the density RANKING (which points are densest); all n points are still scored and ranked, 
+    #   and scoring (violation) downstream is unchanged. The density estimate is stable from a representative subsample, so the retained dense 
+    #   set is effectively the same as exact KDE at a fraction of the cost. Subgroups at or below the threshold use exact KDE (fit on all 
+    #   points), so small subgroups are unaffected.
     # Note: This affects only WHICH points the projections/bounds are learned from. Scoring is still applied to all serving points. 
     # This matches ConFair's LearnCCrules.py: constraints are learned on cc_input (the dense head) but evaluated on the full data:
     def _density_filter(self, X: np.ndarray) -> np.ndarray:
@@ -89,13 +108,20 @@ class ConformanceConstraints:
         # KDE estimates how "dense" the data is at any given point (how many neighbors are nearby):
         kde = KernelDensity(bandwidth=self.density_bandwidth, kernel=self.density_kernel)
 
-        # fit the KDE to the data, learning where the dense & sparse regions are:
-        kde.fit(X)
+        if n <= self.density_exact_below:
+            # exact path: fit on all points (small subgroup, affordable):
+            kde.fit(X)
+        else:
+            # subsample-fit path: fit the density on a representative random
+            # subsample, then score all n points with it. Deterministic via
+            # density_random_state so the filter is reproducible.
+            rng = np.random.RandomState(self.density_random_state)
+            m = min(self.density_fit_subsample, n)
+            fit_idx = rng.choice(n, size=m, replace=False)
+            kde.fit(X[fit_idx])
 
-        # for each point, compute log of its estimated density. Higher value = that point sits in a denser region (more neighbors 
-        # around it). It returns log-density rather than raw density for numerical stability, but the ordering is the same (higher 
-        # still means denser):
-        log_density = kde.score_samples(X)
+        # score (rank) ALL points by density, regardless of fit set:
+        log_density = kde.score_samples(X)  # higher = denser
 
         # indices of the densest 'keep' points ordered by descending density:
         densest_idx = np.argsort(log_density)[::-1][:keep]

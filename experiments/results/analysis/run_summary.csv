@@ -1,0 +1,18 @@
+metric,value
+canonical,experiments/results/matrix_results_with_kde_subsample.csv
+baseline,experiments/results/matrix_results_no_subsample.csv
+datasets,credit;lsac;meps
+models,lr;xgb
+metrics,AOD_star;BalAcc;DI_star
+min_seeds,1
+n_rows,5472
+model_rank_corr,0.8912
+model_rank_corr_pair,lr vs xgb
+model_max_spread,0.1359
+model_max_spread_signal,assignment_proportion_drift
+control_mean_abs_rho,0.0461
+control_defined_cells,276
+control_total_cells,288
+subsample_rank_corr,1.0
+subsample_max_abs_delta,0.0042
+subsample_common_datasets,lsac;meps

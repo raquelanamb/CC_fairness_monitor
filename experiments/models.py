@@ -53,7 +53,7 @@ def train_model(model_name, X_train, y_train, seed=42, tune_threshold=True):
             LogisticRegression(max_iter=1000, random_state=seed),
         )
     elif model_name == "xgb":
-        model = XGBClassifier(random_state=seed, eval_metric="logloss", **XGB_PARAMS)
+        model = XGBClassifier(n_jobs=1, random_state=seed, eval_metric="logloss", **XGB_PARAMS)
     else:
         raise ValueError(f"Unknown model_name {model_name!r}; choose 'lr' or 'xgb'.")
 
