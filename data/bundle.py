@@ -26,7 +26,7 @@ class DatasetBundle:
     feature_names: List[str]  # names of the feature columns, in same order as columns in X_train & X_test
     protected_name: str  # name of protected attribute column (e.g. "race", "RACE", "age")
     label_name: str  # name of label column (e.g. "pass_bar", "UTILIZATION", "SeriousDlqin2yrs")
-    continuous_indices: List[int]  # Column indices of X_train/X_test that are continuous (> 8 distinct values)
+    continuous_indices: List[int]  # Column indices of X_train/X_test that are continuous (>= 8 distinct values)
         # Note: This is following ConFair's num_threshold=8 rule. Conformance Constraints are built on continuous features ONLY 
         # (Fariha et al. 2021 Algorithm 1 line 1 drops non-numerical attributes; ConFair's LearnCCrules.py builds CCs only on the
         # continuous columns). So, the CC code reads this field to select the right columns

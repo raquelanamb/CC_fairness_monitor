@@ -32,7 +32,7 @@ CONFAIR_SEEDS = [
     50, 583, 5278, 100000, 48879, 51966, 57005, 7777, 100, 923
 ] # (used later in the experiment pipeline, when I run a 20-run baseline comparison against ConFair's NO-INTERVENTION results)
 
-# columns w/ more than this many distinct values are treated as continuous (ConFair's num_threshold=8 rule):
+# columns w/ this many distinct values or more are treated as continuous (ConFair's num_threshold=8 rule):
 NUM_THRESHOLD = 8
 
 # loads the preprocessed MEPS dataset & returns a DatasetBundle:
