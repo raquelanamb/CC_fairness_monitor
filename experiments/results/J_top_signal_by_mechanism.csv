@@ -1,0 +1,4 @@
+signal,mechanism,mean_abs_spearman
+per_subgroup_ewma[min_neg],gradual,0.4769193229467985
+per_subgroup_ewma[min_neg],abrupt,0.4101266972933913
+per_subgroup_ewma[min_neg],variance,0.26647322596304235
